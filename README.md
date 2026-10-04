@@ -22,6 +22,4 @@ TodoService owns task rules and state. LocalStorageHandler handles persistence. 
 
 Run `node --test tests/todo.test.mjs` on the Week 4 branch. See [design notes](docs/design-notes.md) for responsibility choices, branch history, diagrams, verification and questions to practise for Test 1.
 
-See [AI assistance disclosure](AI_DISCLOSURE.md). Work must be reviewed and explainable by the student under the course policy.
-
 MIT — see LICENSE.

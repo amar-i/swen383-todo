@@ -47,5 +47,3 @@ A small presentation fix escapes descriptions, timestamps and the oldest label b
 4. Why does the workload summary belong in TodoService?
 5. Why does adding a third task type still violate OCP, and why is it deferred?
 6. What does composition mean in the original class diagram, and how does a sequence diagram differ?
-
-AI assistance is disclosed in `AI_DISCLOSURE.md`. Read the implementation and explain these choices yourself before treating the work as ready for assessment.
