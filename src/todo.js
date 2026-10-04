@@ -1,8 +1,6 @@
-// TodoManager owns the whole app: task data, persistence, and rendering.
-class TodoManager {
-  constructor(containerId) {
+class TodoService {
+  constructor() {
     this.tasks = [];
-    this.container = document.getElementById(containerId);
     this.loadTasks();
   }
 
@@ -17,10 +15,7 @@ class TodoManager {
 
   addTask(description, type) {
     const trimmed = description.trim();
-    if (trimmed.length < 3) {
-      alert('Task needs at least a few characters.');
-      return false;
-    }
+    if (trimmed.length < 3) return null;
 
     if (this.tasks.length >= 20) {
       console.warn('This list is getting long - consider clearing completed tasks.');
@@ -41,8 +36,7 @@ class TodoManager {
 
     this.tasks.push(task);
     this.saveTasks();
-    this.render(task.id);
-    return true;
+    return task.id;
   }
 
   toggleComplete(id) {
@@ -50,41 +44,45 @@ class TodoManager {
     if (!task) return;
     task.completed = !task.completed;
     this.saveTasks();
-    this.render();
   }
 
   deleteTask(id) {
     this.tasks = this.tasks.filter(t => t.id !== id);
     this.saveTasks();
-    this.render();
+  }
+}
+
+class TodoRenderer {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
   }
 
-  renderPendingRows() {
+  renderPendingRows(service) {
     let html = '';
-    for (const task of this.tasks) {
+    for (const task of service.tasks) {
       if (task.completed) continue;
       html += buildTaskRow(task.id, task.desc, task.completed, task.priority, task.createdAt, true);
     }
     return html;
   }
 
-  renderCompletedRows() {
+  renderCompletedRows(service) {
     let html = '';
-    for (const task of this.tasks) {
+    for (const task of service.tasks) {
       if (!task.completed) continue;
       html += buildTaskRow(task.id, task.desc, task.completed, task.priority, task.createdAt, true);
     }
     return html;
   }
 
-  render(justAddedId) {
+  render(service, justAddedId) {
     if (!this.container) return;
 
-    const pendingHtml = this.renderPendingRows();
-    const completedHtml = this.renderCompletedRows();
+    const pendingHtml = this.renderPendingRows(service);
+    const completedHtml = this.renderCompletedRows(service);
 
     let oldestPendingLabel = 'none';
-    for (const task of this.tasks) {
+    for (const task of service.tasks) {
       if (!task.completed) {
         oldestPendingLabel = task.desc;
         break;
@@ -92,7 +90,7 @@ class TodoManager {
     }
 
     this.container.innerHTML =
-      `<p class="status">${summarizeWorkload(this)} - oldest: ${oldestPendingLabel}</p>` +
+      `<p class="status">${summarizeWorkload(service)} - oldest: ${escapeHtml(oldestPendingLabel)}</p>` +
       '<h2 class="section-title">To do</h2>' +
       `<ul>${pendingHtml || '<li>Nothing pending. Add a task above.</li>'}</ul>` +
       '<h2 class="section-title">Completed</h2>' +
@@ -100,12 +98,12 @@ class TodoManager {
 
     const toggleButtons = this.container.querySelectorAll('[data-toggle]');
     for (const btn of toggleButtons) {
-      btn.addEventListener('click', () => this.toggleComplete(Number(btn.dataset.toggle)));
+      btn.addEventListener('click', () => { service.toggleComplete(Number(btn.dataset.toggle)); this.render(service); });
     }
 
     const deleteButtons = this.container.querySelectorAll('[data-delete]');
     for (const btn of deleteButtons) {
-      btn.addEventListener('click', () => this.deleteTask(Number(btn.dataset.delete)));
+      btn.addEventListener('click', () => { service.deleteTask(Number(btn.dataset.delete)); this.render(service); });
     }
 
     if (justAddedId) {
@@ -116,7 +114,7 @@ class TodoManager {
       }
     }
 
-    document.title = `Todo (${this.tasks.filter(t => !t.completed).length})`;
+    document.title = `Todo (${service.tasks.filter(t => !t.completed).length})`;
   }
 }
 
@@ -133,8 +131,8 @@ function buildTaskRow(id, desc, completed, priority, createdAt, showActions) {
     : '';
 
   return `<li class="${completedClass}" data-row="${id}">
-      <span class="task-desc ${priorityClass}">${label}</span>
-      <span class="task-time">${createdAt}</span>
+      <span class="task-desc ${priorityClass}">${escapeHtml(label)}</span>
+      <span class="task-time">${escapeHtml(createdAt)}</span>
       ${actions}
     </li>`;
 }
@@ -159,29 +157,34 @@ function summarizeWorkload(manager) {
   return `${done}/${total} done - ${urgent} urgent, ${normal} normal remaining`;
 }
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  const app = new TodoManager('task-container');
-  app.render();
+  const service = new TodoService();
+  const renderer = new TodoRenderer('task-container');
+  renderer.render(service);
 
   const input = document.getElementById('task-input');
   const addBtn = document.getElementById('add-task-btn');
   const addUrgentBtn = document.getElementById('add-urgent-btn');
 
-  addBtn.addEventListener('click', () => {
-    if (app.addTask(input.value, 'simple')) {
+  function add(type) {
+    const newId = service.addTask(input.value, type);
+    if (newId) {
+      renderer.render(service, newId);
       input.value = '';
+    } else {
+      alert('Task needs at least a few characters.');
     }
-  });
+  }
 
-  addUrgentBtn.addEventListener('click', () => {
-    if (app.addTask(input.value, 'urgent')) {
-      input.value = '';
-    }
-  });
-
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      addBtn.click();
-    }
+  addBtn.addEventListener('click', () => add('simple'));
+  addUrgentBtn.addEventListener('click', () => add('urgent'));
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') addBtn.click();
   });
 });
