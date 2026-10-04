@@ -1,4 +1,4 @@
 {
-  "plantuml.render": "PlantUMLServer",
-  "plantuml.server": "https://www.plantuml.com/plantuml"
+  "plantuml.render": "Local",
+  "plantuml.jar": "${workspaceFolder}/.tools/plantuml.jar"
 }

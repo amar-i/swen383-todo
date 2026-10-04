@@ -1,4 +1,5 @@
 @startuml OriginalTodoApp
+!pragma layout smetana
  title Week 2 — actual upstream design before refactoring
  class TodoManager {
   +tasks: Task[]

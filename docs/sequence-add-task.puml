@@ -20,10 +20,8 @@
  Storage --> Manager : undefined
  deactivate Storage
  Manager -> Manager : render(task.id)
- Manager -> Manager : renderPendingRows() / renderCompletedRows()
-buildTaskRow(...) / summarizeWorkload(this)
- Manager -> DOM : set innerHTML; bind Done / Delete handlers
-flash new row; update document.title
+ Manager -> Manager : renderPendingRows() / renderCompletedRows()\nbuildTaskRow(...) / summarizeWorkload(this)
+ Manager -> DOM : set innerHTML; bind Done / Delete handlers\nflash new row; update document.title
  activate DOM
  DOM --> Manager : UI updated
  deactivate DOM
