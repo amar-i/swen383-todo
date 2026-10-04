@@ -1,6 +1,11 @@
 export class TodoRenderer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
+    this.actions = { onToggle() {}, onDelete() {} };
+  }
+
+  bindActions(actions) {
+    this.actions = actions;
   }
 
   renderPendingRows(service) {
@@ -44,12 +49,12 @@ export class TodoRenderer {
 
     const toggleButtons = this.container.querySelectorAll('[data-toggle]');
     for (const btn of toggleButtons) {
-      btn.addEventListener('click', () => { service.toggleComplete(Number(btn.dataset.toggle)); this.render(service); });
+      btn.addEventListener('click', () => this.actions.onToggle(Number(btn.dataset.toggle)));
     }
 
     const deleteButtons = this.container.querySelectorAll('[data-delete]');
     for (const btn of deleteButtons) {
-      btn.addEventListener('click', () => { service.deleteTask(Number(btn.dataset.delete)); this.render(service); });
+      btn.addEventListener('click', () => this.actions.onDelete(Number(btn.dataset.delete)));
     }
 
     if (justAddedId) {

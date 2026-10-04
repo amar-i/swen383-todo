@@ -2,6 +2,10 @@ export class TodoController {
   constructor(todoService, todoRenderer) {
     this.todoService = todoService;
     this.todoRenderer = todoRenderer;
+    todoRenderer.bindActions({
+      onToggle: id => this.toggleTask(id),
+      onDelete: id => this.deleteTask(id)
+    });
   }
 
   start() {
