@@ -41,7 +41,7 @@ export class TodoRenderer {
     }
 
     this.container.innerHTML =
-      `<p class="status">${summarizeWorkload(service)} - oldest: ${escapeHtml(oldestPendingLabel)}</p>` +
+      `<p class="status">${service.getWorkloadSummary()} - oldest: ${escapeHtml(oldestPendingLabel)}</p>` +
       '<h2 class="section-title">To do</h2>' +
       `<ul>${pendingHtml || '<li>Nothing pending. Add a task above.</li>'}</ul>` +
       '<h2 class="section-title">Completed</h2>' +
@@ -86,26 +86,6 @@ function buildTaskRow(id, desc, completed, priority, createdAt, showActions) {
       <span class="task-time">${escapeHtml(createdAt)}</span>
       ${actions}
     </li>`;
-}
-
-// A quick one-line summary of where the list stands, for the status bar.
-function summarizeWorkload(manager) {
-  let done = 0;
-  let urgent = 0;
-  let normal = 0;
-
-  for (const task of manager.tasks) {
-    if (task.completed) {
-      done++;
-    } else if (task.priority === 'high') {
-      urgent++;
-    } else {
-      normal++;
-    }
-  }
-
-  const total = manager.tasks.length;
-  return `${done}/${total} done - ${urgent} urgent, ${normal} normal remaining`;
 }
 
 function escapeHtml(value) {
