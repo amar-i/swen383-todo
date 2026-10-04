@@ -1,16 +1,11 @@
 class TodoService {
-  constructor() {
-    this.tasks = [];
-    this.loadTasks();
-  }
-
-  loadTasks() {
-    const raw = localStorage.getItem('todo-tasks');
-    this.tasks = raw ? JSON.parse(raw) : [];
+  constructor(storageHandler) {
+    this.storageHandler = storageHandler;
+    this.tasks = storageHandler.load();
   }
 
   saveTasks() {
-    localStorage.setItem('todo-tasks', JSON.stringify(this.tasks));
+    this.storageHandler.save(this.tasks);
   }
 
   addTask(description, type) {
@@ -163,8 +158,19 @@ function escapeHtml(value) {
   })[character]);
 }
 
+class LocalStorageHandler {
+  load() {
+    const raw = localStorage.getItem('todo-tasks');
+    return raw ? JSON.parse(raw) : [];
+  }
+
+  save(tasks) {
+    localStorage.setItem('todo-tasks', JSON.stringify(tasks));
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  const service = new TodoService();
+  const service = new TodoService(new LocalStorageHandler());
   const renderer = new TodoRenderer('task-container');
   renderer.render(service);
 
