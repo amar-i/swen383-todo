@@ -1,23 +1,26 @@
 # Todo App
 
-A small browser Todo list: add tasks, mark them complete, delete them. Tasks are kept in the
-browser's local storage. Plain HTML, CSS and JavaScript, no build step.
+I use this app to add normal and urgent tasks, mark them complete, undo completion and delete them. My tasks are saved in browser localStorage. The app uses HTML, CSS and JavaScript with no build step.
 
-This is the shared codebase for SWEN-383 (Software Design Principles and Patterns) at RIT Kosovo.
-Every student forks this repository in Week 1 and evolves it, week by week, as the course covers
-new design principles and patterns.
+This is my fork of the shared SWEN-383 Todo App.
 
 ## Running it
 
-Open `index.html` with a live-reloading server, such as the VS Code "Live Server" extension, and it
-runs in your browser. Nothing to install beyond Git, a browser, and an editor.
+I open `index.html` with the VS Code Live Server extension. The JavaScript modules need an HTTP server, so I do not open the HTML file directly from the filesystem.
 
 ## Files
 
-- `index.html` - page structure
-- `style.css` - styling
-- `src/todo.js` - application logic
+- `index.html` — page structure
+- `style.css` — styling
+- `src/TodoService.js` — tasks, validation and persistence through an injected handler
+- `src/TodoRenderer.js` — DOM rendering
+- `src/LocalStorageHandler.js` — browser storage
+- `src/main.js` — startup and dependency wiring
+- `src/TodoController.js` — coordinates UI actions
+- `SMELLS.md` — my three findings from the original code
+- `docs/class-diagram.puml` — the original app's structure
+- `docs/sequence-add-task.puml` — the original successful Add a Task scenario
 
 ## License
 
-MIT - see `LICENSE`.
+MIT — see `LICENSE`.
